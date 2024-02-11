@@ -1,0 +1,30 @@
+#formId {
+    margin-top:100px;
+    margin-bottom:20px;
+    text-align: center;
+}
+
+#container {
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr; 
+    column-gap:2rem;
+    /* height below depends on height of children divs*/
+    grid-template-rows:100%;
+
+}
+
+
+
+#card {
+    height:500px;
+    border:5px solid rgb(0, 96, 128);
+    border-radius: 20px;
+}
+
+#card>img {
+    display:block;
+    width:60%;
+    margin:auto;
+    margin-top:30px;
+}
+
