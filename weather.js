@@ -36,11 +36,13 @@ async function getForecast(loc) {
 }
   
 
-function submitForm(event) {
+async function submitForm(event) {
     //Prevent form from submitting, just grab location and call getForecast();
     event.preventDefault();
     const location = text.value;
-    getForecast(location).then(response=>createObjects(response)).then(info=>console.log(info[0])).catch(error=>alert(error));
+    const forecast = await getForecast(location);
+    const arrayWeather = await createObjects(forecast);
+    console.log(arrayWeather[1]);
 }
 
 function getData(array) {
