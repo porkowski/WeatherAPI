@@ -1,4 +1,5 @@
-//Weather icons from Tiru19 on reddit
+
+
 
 //Grab form elements from DOM
 const form = document.getElementById("formId");
@@ -8,7 +9,7 @@ const text = document.getElementById("Location");
 let storedForecast = [];
 
 //Create constructor for Forecast
-function Forecast(date,sunrise,sunset,condition,conditionCode,maxtempC,mintempC,maxtempF,mintempF,totalprecipIn,totalprecipMm,tsnowCm,maxwindKph,maxwindMph) {
+function Forecast(date,sunrise,sunset,condition,conditionCode,maxtempC,mintempC,maxtempF,mintempF,totalprecipIn,totalprecipMm,tsnowCm,maxwindKph) {
     this.date=date;
     this.sunrise=sunrise;
     this.sunset=sunset;
@@ -22,7 +23,7 @@ function Forecast(date,sunrise,sunset,condition,conditionCode,maxtempC,mintempC,
     this.totalprecipMm=totalprecipMm;
     this.tsnowCm=tsnowCm;
     this.maxwindKph=maxwindKph;
-    this.maxwindMph=maxwindMph;
+
 }
 
 
@@ -61,9 +62,8 @@ function getData(array) {
         const totalprecipMm = d.totalprecip_mm;
         const tsnowCm = d.totalsnow_cm;
         const maxwindKph = d.maxwind_kph;
-        const maxwindMph = d.maxwindMph;
 
-        const day = new Forecast(dayNum,sunrise,sunset,condition,conditionCode,maxtempC,mintempC,maxtempF,mintempF,totalprecipIn,totalprecipMm,tsnowCm,maxwindKph,maxwindMph);
+        const day = new Forecast(dayNum,sunrise,sunset,condition,conditionCode,maxtempC,mintempC,maxtempF,mintempF,totalprecipIn,totalprecipMm,tsnowCm,maxwindKph);
         //Push object to array of 3 day forecast
         forecastarray.push(day);
 
@@ -76,14 +76,20 @@ function getData(array) {
   
 
 async function storeForecast() {
+    try {
     const location = text.value;
     const forecast = await getForecast(location);
     const arrayWeather = await getData(forecast);
     return arrayWeather;
+    }catch {
+        alert('An error has occured. Please select another location.')
+    }
 }
 
 function displayInCard(forecastarray) {
+    //First, start with changing the image to the appropriate weather condition
     const img = document.querySelectorAll("img");
+    const card = document.querySelectorAll("#card");
     img.forEach(image=> {
         const id = image.parentNode.parentNode.getAttribute('id');
         let condition = forecastarray[id].conditionCode;
@@ -109,6 +115,61 @@ function displayInCard(forecastarray) {
 
         image.setAttribute('src','weather/'+code+'.png');
     })
+
+    //Create a list on each div to note all the remaining information per each given day
+    card.forEach(card=> {
+        
+        const id = card.parentNode.getAttribute('id');
+        const dayObject = forecastarray[id]; 
+        const list = document.createElement("ul");
+        
+        //if a list already exists, remove it to start from a clear slate
+        if (card.querySelector('ul') !== null) {
+            card.querySelector('ul').remove();
+        }
+ 
+
+        list.appendChild(document.createElement('li')).textContent = `${dayObject.condition}`;
+
+        //Check if Fahrenheit or Celsius is selected to display one or the other
+        let selectedTemp = document.querySelector('input[name="temp"]:checked')
+        if (selectedTemp.id == 'F') {
+            list.appendChild(document.createElement('li')).textContent = `High of ${Math.round(dayObject.maxtempF)}ºF`
+            list.appendChild(document.createElement('li')).textContent = `Low of ${Math.round(dayObject.mintempF)}ºF`
+            list.appendChild(document.createElement('li')).textContent = `Sun rise at ${dayObject.sunrise}`
+            list.appendChild(document.createElement('li')).textContent = `Sun set at ${dayObject.sunset}`
+
+            if (dayObject.totalprecipIn>0) {
+                list.appendChild(document.createElement('li')).textContent = `Total expected precipitation is ${dayObject.totalprecipIn} inches`
+            }
+        } else if (selectedTemp.id == 'C') {
+            list.appendChild(document.createElement('li')).textContent = `High of ${Math.round(dayObject.maxtempC)}ºC`
+            list.appendChild(document.createElement('li')).textContent = `Low of ${Math.round(dayObject.mintempC)}ºC`
+            list.appendChild(document.createElement('li')).textContent = `Sun rise at ${dayObject.sunrise}`
+            list.appendChild(document.createElement('li')).textContent = `Sun set at ${dayObject.sunset}`
+
+            if (dayObject.totalprecipIn>0) {
+                list.appendChild(document.createElement('li')).textContent = `Total expected precipitation is ${dayObject.totalprecipMm} mm`
+            }
+        }
+
+            if (dayObject.maxwindKph<11) {
+                list.appendChild(document.createElement('li')).textContent =  `Calm winds expected: Maximum windspeed at ${Math.round(dayObject.maxwindKph)} Kph`
+            } else if (11<dayObject.maxwindKph<38) {
+                list.appendChild(document.createElement('li')).textContent =  `Moderate winds expected: Maximum windspeed at ${Math.round(dayObject.maxwindKph)} Kph`
+            } else if (dayObject.maxwindKph>38) {
+                list.appendChild(document.createElement('li')).textContent =  `Heavy winds expected: Maximum windspeed at ${Math.round(dayObject.maxwindKph)} Kph`
+            }
+            
+  
+            if (dayObject.tsnowCm>0) {
+                list.appendChild(document.createElement('li')).textContent = `Total expected snowfall is ${dayObject.tsnowCm} cm`
+            }
+
+
+        card.appendChild(list);
+    })
+    
 }
 
 async function submitForm(event) {

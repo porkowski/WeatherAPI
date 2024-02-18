@@ -8,13 +8,24 @@
 
 </head>
 <body>
+    <h1>Pat's Weather Forecaster</h1>
     <form id="formId">
         <div>
             <label for="location">Location:</label>
             <input type="text" name="Location" id="Location" placeholder="Warsaw" />
-            <button class="submit">Submit!</button>
+            <fieldset>
+                <legend>
+                    Select your preferred temperature reading:
+                </legend>
+                <input type="radio" id="F" name="temp" value="Fahrenheit" checked>
+                <label for="F">Fahrenheit</label>
+                <input type="radio" id="C" name="temp" value="Celsius">
+                <label for="C">Celsius</label>
+            </fieldset>
+            <button class="submit">Display forecast</button>
         </div>
     </form>
+
     <div id="container">
         <div id="0">
             <div id="card">
@@ -32,6 +43,7 @@
             </div>
         </div>
     </div>
+    <footer>Font provided by Galdino Otten. Weather icons provided by reddit user Tiru19</footer>
 </body>
 <script src="weather.js"></script>
 </html>
